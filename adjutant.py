@@ -6,6 +6,8 @@ import logging
 from discord.ext import commands
 import re
 import string
+from math import trunc
+from credentials import token
 
 # Sets up writing to a local log file.
 logger = logging.getLogger('discord')
@@ -29,6 +31,7 @@ async def roll(ctx, roll : str):
     
     resultTotal = 0
     resultString = ''
+
     try:
         try: 
             numDice = roll.split('d')[0]
@@ -60,6 +63,54 @@ async def roll(ctx, roll : str):
         else:
             await bot.say(ctx.message.author.mention + "  :game_die:\n**Result:** " + resultString + "\n**Total:** " + str(resultTotal))
 
+    except Exception as e:
+        print(e)
+        return
+
+# Quick rolling of 40KRPG tests.
+@bot.command(pass_context=True)
+async def dhroll(ctx, roll : str):
+    """"Rolls a d100 using a # to set a success threshold.
+    e.g !dhroll 50"""
+
+    isRollSuccess = False
+    resultTotal = 0
+    resultString = ''
+    
+    try:
+        try:
+            successThreshold = int(roll)
+        except Exception as e:
+            print (e)
+            await bot.say("Value must be an integer.")
+            return
+
+        if successThreshold < 1:
+            await bot.say("Value must be greater than 1.")
+
+        bot.type()
+        await bot.say("Rolling 1d100 with a target number of %s for %s." % (successThreshold, ctx.message.author.name))
+
+        number = randint(1, 100)
+        if number < successThreshold:
+            isRollSuccess = True
+            resultTotal = (trunc(((successThreshold - number) / 10)) + 1)
+            resultString += str(resultTotal)
+        else:
+            resultTotal = (trunc(((number - successThreshold) / 10)) + 1)
+            resultString += str(resultTotal)
+
+        if isRollSuccess:
+            if resultTotal == 1:
+                await bot.say(ctx.message.author.mention + "  :game_die:\n**Result:** " + str(number) + "\n**Succeeded by " + resultString + " degree.**")
+            else:
+                await bot.say(ctx.message.author.mention + "  :game_die:\n**Result:** " + str(number) + "\n**Succeeded by " + resultString + " degrees.**")
+        else:
+            if resultTotal == 1:
+                await bot.say(ctx.message.author.mention + "  :game_die:\n**Result:** " + str(number) + "\n**Failed by " + resultString + " degree.**")
+            else:
+                await bot.say(ctx.message.author.mention + "  :game_die:\n**Result:** " + str(number) + "\n**Failed by " + resultString + " degrees.**")
+                
     except Exception as e:
         print(e)
         return
@@ -194,4 +245,4 @@ async def srroll(ctx, roll : str):
         return
 
 #Logs the bot in to Discord.
-bot.run('bot-token')
+bot.run(token)
