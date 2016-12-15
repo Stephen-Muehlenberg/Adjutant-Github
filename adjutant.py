@@ -7,6 +7,7 @@ from discord.ext import commands
 import re
 import string
 from math import trunc
+from credentials import token
 
 # Sets up writing to a local log file.
 logger = logging.getLogger('discord')
@@ -244,4 +245,4 @@ async def srroll(ctx, roll : str):
         return
 
 #Logs the bot in to Discord.
-bot.run('MjUyNjI2MDM1MzI0MDkyNDI4.CzLG5g.Jk1dVq8eGBjbviiR3BR8CIac91E')
+bot.run(token)
