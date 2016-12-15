@@ -135,7 +135,7 @@ async def rollt(ctx, roll : str):
 
     except Exception as e:
         print(e)
-        await bot.say("Format has to be in #d#t# %s." % ctx.message.author.name)
+        await bot.say("Format has to be in #d#t#,  %s." % ctx.message.author.name)
         return
     
     if int(diceCount) > 500:
@@ -235,14 +235,63 @@ async def srroll(ctx, roll : str):
             if numberSuccesses == 0:
                 await bot.say(ctx.message.author.mention + "  :game_die:\n**Result:** " + resultString + "\n***CRITICAL GLITCH!***")
             else:
-                await bot.say(ctx.message.author.mention + "  :game_die:\n**Result:** " + resultString + "\n**Hits: **" + str(numberSuccesses) + "  **Glitch!**")
+                await bot.say(ctx.message.author.mention + "  :game_die:\n**Result:** " + resultString + "\n**Hits: " + str(numberSuccesses) + '**' + "  **Glitch!**")
         else:
-            await bot.say(ctx.message.author.mention + "  :game_die:\n**Result:** " + resultString + "\n**Hits: **" + str(numberSuccesses))
+            await bot.say(ctx.message.author.mention + "  :game_die:\n**Result:** " + resultString + "\n**Hits: " + str(numberSuccesses) + '**')
         
 
     except Exception as e:
         print(e)
         return
+
+# Allows rolling of a Chronicles of Darkness dice-pool, with exploding dice.
+#Allows dice rolling functionality.
+@bot.command(pass_context=True)
+async def codroll(ctx, roll : str):
+    """Rolls a dice using #d# format.
+    e.g !roll 3d6"""
+    
+    resultTotal = 0
+    resultString = ''
+    numberSuccesses = 0
+
+    try:
+        try: 
+            numDice = roll.split('d')[0]
+            diceVal = 10
+            explodeThreshold = roll.split('d')[1]
+        except Exception as e:
+            print(e)
+            await bot.say("Format has to be in #d# %s." % ctx.message.author.name)
+            return
+
+        if int(numDice) > 500:
+            await bot.say("I can\'t roll that many dice, %s." % ctx.message.author.name)
+            return
+        
+        bot.type()
+        await bot.say("Rolling %s d%s for %s" % (numDice, diceVal, ctx.message.author.name))
+        rolls, explodeThreshold = map(int, roll.split('d'))
+
+        for r in range(rolls):
+            number = randint(1, diceVal)
+            if number >= 7:
+                numberSuccesses += 1
+
+            if number >= explodeThreshold:
+                number
+            
+            if resultString == '':
+                resultString += str(number)
+            else:
+                resultString += ', ' + str(number)
+        
+        await bot.say(ctx.message.author.mention + "  :game_die:\n**Result:** " + resultString)
+
+    except Exception as e:
+        print(e)
+        return    
+        
 
 #Logs the bot in to Discord.
 bot.run(token)
